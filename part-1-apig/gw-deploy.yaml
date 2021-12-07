@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: tyk-gtw
-          image: "tykio/tyk-gateway:v3.1.0"
+          image: "tykio/tyk-gateway:v3.2.2"
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

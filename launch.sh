@@ -4,15 +4,14 @@ set -eo pipefail
 
 if [ $1 == "all" ]
 then 
-
-    # mkdir charts
-    # git clone https://github.com/TykTechnologies/tyk-operator ./charts/tyk-operator
+    ls charts || mkdir charts
+    git clone https://github.com/TykTechnologies/tyk-operator ./charts/tyk-operator || true
     echo "Cloned repositories, ready to go"
 
     echo "Creating tyk-operator-system namespace.."
-    kubectl create namespace tyk-operator-system
+    kubectl create namespace tyk-operator-system || true
     echo "Creating tyk namespace.."
-    kubectl create namespace tyk
+    kubectl create namespace tyk || true
     echo "Successfully created all namespaces :)"
 
     echo "Installing Tyk GW & Redis"
@@ -31,19 +30,25 @@ then
         --from-literal "TYK_ORG=1" \
         --from-literal "TYK_MODE=ce" \
         --from-literal "TYK_URL=http://tyk-svc.tyk.svc:8080" \
-        --from-literal "TYK_TLS_INSECURE_SKIP_VERIFY=true"
+        --from-literal "TYK_TLS_INSECURE_SKIP_VERIFY=true" || true
     echo "Set tyk-operator-conf secret: "
     kubectl get secret/tyk-operator-conf -n tyk-operator-system -o json | jq '.data'
     echo "Registering tyk-operator CRDs with Kubernetes.."
-    # kubectl apply -f ./charts/tyk-operator/helm/crds
+    kubectl get tykapis || kubectl apply -f ./charts/tyk-operator/helm/crds
     echo "Installing tyk-operator in tyk-operator-system namespace.."
     helm install tyk-operator ./charts/tyk-operator/helm -n tyk-operator-system
     echo "Successfully installed the tyk-operator :_)"
     exit 0
+elif [ $1 == "apiclarity" ]
+then
+    echo "Installing API Clarity into cluster"
+    helm repo add apiclarity https://apiclarity.github.io/apiclarity
+    helm install --create-namespace apiclarity apiclarity/apiclarity -n apiclarity
+    exit 0
 elif [ $1 == "all-down" ]
 then 
     echo "Deleting 'tyk' and 'tyk-operator-system' namespaces'"
-    kubectl delete tykapis --all
+    kubectl delete tykapis --all || true
     kubectl delete ns tyk
     kubectl delete ns tyk-operator-system
     
