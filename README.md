@@ -1,4 +1,4 @@
-# automatic REST testing in E2E and CICD settings with Postman's Newman SDK
+# Auto REST testing in E2E & CICD settings with Postman's Newman SDK
 
 1. Deploy Tyk APIG, Redis, ElasticSearch / Kibana, Tyk Pump & Tyk Operator
 ```
